@@ -12,6 +12,9 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        afacad: ["Afacad", "sans-serif"], // Add the custom font here
+      },
     },
   },
   plugins: [],
