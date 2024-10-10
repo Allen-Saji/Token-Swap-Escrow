@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/app/components/Navbar";
+import React from "react";
+import WalletContextProvider from "./providers/WalletContextProvider";
 
 export const metadata: Metadata = {
   title: "Swap Vault",
@@ -15,11 +17,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.png" />{" "}
+        <link rel="icon" href="/logo.png" />{" "}
       </head>
       <body>
-        <Navbar />
-        {children}
+        <WalletContextProvider>
+          <header className="container z-40">
+            <div className="flex h-20 items-center justify-between py-6">
+              <Navbar />
+            </div>
+          </header>
+          <main className="mx-4 overflow-x-hidden">{children}</main>
+        </WalletContextProvider>
       </body>
     </html>
   );
