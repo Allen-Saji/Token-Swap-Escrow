@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -45,7 +47,7 @@ const Navbar = () => {
       <div className="flex space-x-8">
         {" "}
         {/* Increased space between links */}
-        <Link href="/escrow">
+        <Link href="/escrow/create">
           <div className="text-gray-300 hover:text-white text-xl mx-4">
             Create an Escrow
           </div>
@@ -59,9 +61,7 @@ const Navbar = () => {
 
       {/* Connect Wallet Button */}
       <div>
-        <button className="bg-black text-gray-300 border border-gray-300 py-2 px-4 rounded hover:text-white hover:bg-gray-600 transition">
-          Connect Wallet
-        </button>
+        <WalletMultiButton />
       </div>
     </nav>
   );
