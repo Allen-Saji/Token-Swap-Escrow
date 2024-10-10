@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import React from "react";
 import WalletContextProvider from "./providers/WalletContextProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Swap Vault",
@@ -27,6 +28,7 @@ export default function RootLayout({
             </div>
           </header>
           <main className="mx-4 overflow-x-hidden">{children}</main>
+          <Toaster />
         </WalletContextProvider>
       </body>
     </html>
