@@ -6,7 +6,7 @@ use contexts::*;
 pub mod state;
 pub use state::*;
 
-declare_id!("J6sxC3jE2NNgjrU9cKkwWKFMLWpN8A1PhYFcGURUvD1C");
+declare_id!("CZZGjVFQ4ZZvES1gnL2LWfVWAUZsX7bbd1wNAGE85yf1");
 
 #[program]
 pub mod token_swap_escrow {
