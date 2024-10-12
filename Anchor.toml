@@ -7,6 +7,9 @@ skip-lint = false
 [programs.localnet]
 token_swap_escrow = "BijCEyP7WqxbuYWpBaHjgV2pigN166NMjhMvE1d3moYx"
 
+[programs.devnet]
+token_swap_escrow = "6U2q3J5Ubi7gdboM1baGiz51kam7puCRo3QyztpEZ4FY"
+
 [registry]
 url = "https://api.apr.dev"
 
