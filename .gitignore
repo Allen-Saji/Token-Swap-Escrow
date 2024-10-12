@@ -6,4 +6,5 @@ node_modules
 test-ledger
 .yarn
 wallet
+.env
 
