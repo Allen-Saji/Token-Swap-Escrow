@@ -19,7 +19,6 @@ export function useProgram() {
 
   const provider = new AnchorProvider(connection, wallet, {});
   const program = new Program(idl as Idl, provider);
-
   return { program, provider };
 }
 
@@ -110,3 +109,56 @@ export async function createEscrow(
     throw error;
   }
 }
+// Function to fetch escrow data from Solana
+export const fetchEscrowData = async (
+  escrowPublicKey: string,
+  connection: web3.Connection
+) => {
+  const escrowAccountPubkey = new PublicKey(escrowPublicKey);
+
+  // Fetch the account info
+  const escrowAccountInfo = await connection.getAccountInfo(
+    escrowAccountPubkey
+  );
+  if (!escrowAccountInfo) {
+    throw new Error("Escrow account not found");
+  }
+
+  const result = deserializeEscrowAccount(escrowAccountInfo.data);
+
+  return result;
+};
+
+// Function to deserialize the account data
+const deserializeEscrowAccount = (data: Uint8Array) => {
+  const dataBuffer = Buffer.from(data);
+
+  // Skip the 8-byte discriminator
+  let offset = 8;
+
+  let seed = new BN(dataBuffer.slice(offset, offset + 8), "le");
+  offset += 8;
+  let rseed = seed.toString(10);
+
+  const maker = new PublicKey(dataBuffer.slice(offset, offset + 32));
+  offset += 32;
+  let rmaker = maker.toBase58();
+  const mintA = new PublicKey(dataBuffer.slice(offset, offset + 32));
+  offset += 32;
+  let rmintA = mintA.toBase58();
+
+  const mintB = new PublicKey(dataBuffer.slice(offset, offset + 32));
+  offset += 32;
+  let rmintB = mintB.toBase58();
+
+  const deposit = new BN(dataBuffer.slice(offset, offset + 8), "le");
+  offset += 8;
+  let rdeposit = deposit.toString();
+
+  const receive = new BN(dataBuffer.slice(offset, offset + 8), "le");
+  offset += 8;
+
+  let rreceive = receive.toString();
+
+  return { rseed, rmaker, rmintA, rmintB, rdeposit, rreceive };
+};
