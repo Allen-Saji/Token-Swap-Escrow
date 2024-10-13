@@ -8,6 +8,10 @@ import {
   getMint,
 } from "@solana/spl-token";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
+import {
+  deserializeEscrowAccount,
+  DeserializedEscrow,
+} from "../lib/deserializeEscrow";
 
 export function useProgram() {
   const wallet = useAnchorWallet();
@@ -124,41 +128,68 @@ export const fetchEscrowData = async (
     throw new Error("Escrow account not found");
   }
 
-  const result = deserializeEscrowAccount(escrowAccountInfo.data);
+  const result = deserializeEscrowAccount(escrowAccountInfo.data, connection);
 
   return result;
 };
 
-// Function to deserialize the account data
-const deserializeEscrowAccount = (data: Uint8Array) => {
-  const dataBuffer = Buffer.from(data);
+// New refund function
+export async function refundEscrow(
+  escrowAccount: DeserializedEscrow,
+  config: { program: Program; provider: AnchorProvider }
+) {
+  if (!config.program || !config.provider) {
+    throw new Error("Program or provider is not initialized");
+  }
 
-  // Skip the 8-byte discriminator
-  let offset = 8;
+  try {
+    // Get the maker's public key from the escrow account
+    const maker = new PublicKey(escrowAccount.maker);
 
-  let seed = new BN(dataBuffer.slice(offset, offset + 8), "le");
-  offset += 8;
-  let rseed = seed.toString(10);
+    // Get the mint A from the escrow account
+    const mintA = new PublicKey(escrowAccount.mintA);
 
-  const maker = new PublicKey(dataBuffer.slice(offset, offset + 32));
-  offset += 32;
-  let rmaker = maker.toBase58();
-  const mintA = new PublicKey(dataBuffer.slice(offset, offset + 32));
-  offset += 32;
-  let rmintA = mintA.toBase58();
+    // Get the seed from the escrow account
+    const seed = new BN(escrowAccount.seed);
 
-  const mintB = new PublicKey(dataBuffer.slice(offset, offset + 32));
-  offset += 32;
-  let rmintB = mintB.toBase58();
+    // Find the program address for the escrow
+    const [escrowPDA] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("escrow"),
+        maker.toBuffer(),
+        seed.toArrayLike(Buffer, "le", 8),
+      ],
+      config.program.programId
+    );
 
-  const deposit = new BN(dataBuffer.slice(offset, offset + 8), "le");
-  offset += 8;
-  let rdeposit = deposit.toString();
+    // Get associated token addresses
+    const makerAta = await getAssociatedTokenAddress(mintA, maker);
+    const vault = await getAssociatedTokenAddress(mintA, escrowPDA, true);
 
-  const receive = new BN(dataBuffer.slice(offset, offset + 8), "le");
-  offset += 8;
+    // Create the instruction
+    const ix = await config.program.methods
+      .refund()
+      .accounts({
+        maker: maker,
+        mintA: mintA,
+        makerAtaA: makerAta,
+        escrow: escrowPDA,
+        vault: vault,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
 
-  let rreceive = receive.toString();
+    // Create the transaction
+    const tx = new web3.Transaction().add(ix);
 
-  return { rseed, rmaker, rmintA, rmintB, rdeposit, rreceive };
-};
+    // Send and confirm the transaction
+    const signature = await config.provider.sendAndConfirm(tx);
+    console.log(`Refund transaction signature: ${signature}`);
+    return { txSignature: signature };
+  } catch (error) {
+    console.error("Error refunding escrow:", error);
+    throw error;
+  }
+}
