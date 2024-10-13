@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { createEscrow, useProgram } from "../lib/anchor";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const CreateEscrowForm = () => {
   const { publicKey, connected } = useWallet();
   const config = useProgram();
   const { toast } = useToast();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     makerPublicKey: "",
@@ -18,18 +20,16 @@ const CreateEscrowForm = () => {
     receiveTokenAmount: "",
   });
 
-  // When the wallet is connected, set the makerPublicKey to the wallet's public key
-  // If disconnected, clear the makerPublicKey
   useEffect(() => {
     if (connected && publicKey) {
       setFormData((prevData) => ({
         ...prevData,
-        makerPublicKey: publicKey.toBase58(), // Automatically fill with public key
+        makerPublicKey: publicKey.toBase58(),
       }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        makerPublicKey: "", // Clear public key field when disconnected
+        makerPublicKey: "",
       }));
     }
   }, [connected, publicKey]);
@@ -63,7 +63,6 @@ const CreateEscrowForm = () => {
       const { txSignature: signature, escrow: escrowAddress } =
         await createEscrow(formData, config);
 
-      // Send POST request to /api/escrow
       const response = await fetch("/api/escrow", {
         method: "POST",
         headers: {
@@ -83,6 +82,9 @@ const CreateEscrowForm = () => {
         title: "Escrow created",
         description: `Escrow created with signature: ${signature}`,
       });
+
+      // Redirect to the my-escrows page after successful creation
+      router.push("/escrow/my-escrows");
     } catch (error) {
       toast({
         variant: "destructive",
