@@ -103,7 +103,7 @@ export async function createEscrow(
     // Send and confirm the transaction
     const signature = await config.provider.sendAndConfirm(tx);
     console.log(`Transaction signature: ${signature}`);
-    return signature;
+    return { txSignature: signature, escrow: escrowPDA.toBase58() };
   } catch (error) {
     console.error("Error creating escrow:", error);
     throw error;

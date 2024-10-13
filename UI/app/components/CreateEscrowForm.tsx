@@ -60,7 +60,25 @@ const CreateEscrowForm = () => {
     }
 
     try {
-      const signature = await createEscrow(formData, config);
+      const { txSignature: signature, escrow: escrowAddress } =
+        await createEscrow(formData, config);
+
+      // Send POST request to /api/escrow
+      const response = await fetch("/api/escrow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          walletAddress: formData.makerPublicKey,
+          escrowAddress: escrowAddress,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save escrow data");
+      }
+
       toast({
         title: "Escrow created",
         description: `Escrow created with signature: ${signature}`,
