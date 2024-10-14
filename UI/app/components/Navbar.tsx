@@ -51,9 +51,14 @@ const Navbar = () => {
             Create an Escrow
           </div>
         </Link>
-        <Link href="/find-escrow">
+        <Link href="/escrow/find">
           <div className="text-gray-300 hover:text-white text-xl mx-4">
             Find an Escrow
+          </div>
+        </Link>
+        <Link href="/escrow/my-escrows">
+          <div className="text-gray-300 hover:text-white text-xl mx-4">
+            My Escrows
           </div>
         </Link>
       </div>
