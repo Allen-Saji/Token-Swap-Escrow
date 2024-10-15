@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import EscrowCard from "@/app/components/EscrowCard";
-import { useProgram, fetchEscrowData, refundEscrow } from "@/app/lib/anchor";
+import EscrowCard from "@/components/EscrowCard";
+import { useProgram, fetchEscrowData, refundEscrow } from "@/lib/anchor";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { DeserializedEscrow } from "@/app/lib/deserializeEscrow";
+import { DeserializedEscrow } from "@/lib/deserializeEscrow";
 
 interface EscrowWithAddress extends DeserializedEscrow {
   address: string;

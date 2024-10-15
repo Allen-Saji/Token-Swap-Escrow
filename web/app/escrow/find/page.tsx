@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { fetchEscrowData, payAndClose, useProgram } from "@/app/lib/anchor";
-import EscrowCard from "@/app/components/EscrowCard";
+import { fetchEscrowData, payAndClose, useProgram } from "@/lib/anchor";
+import EscrowCard from "@/components/EscrowCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { DeserializedEscrow } from "@/app/lib/deserializeEscrow";
+import { DeserializedEscrow } from "@/lib/deserializeEscrow";
 
 export default function EscrowSearchPage() {
   const [escrowPublicKey, setEscrowPublicKey] = useState("");

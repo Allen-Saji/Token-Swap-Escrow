@@ -1,5 +1,5 @@
 import React from "react";
-import CreateEscrowForm from "@/app/components/CreateEscrowForm";
+import CreateEscrowForm from "@/components/CreateEscrowForm";
 
 function page() {
   return (

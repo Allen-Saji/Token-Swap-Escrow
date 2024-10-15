@@ -1,5 +1,5 @@
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import idl from "../idl/idl.json";
+import idl from "../app/idl/idl.json";
 import { Program, AnchorProvider, Idl, web3, BN } from "@coral-xyz/anchor";
 import {
   getAssociatedTokenAddress,
@@ -12,7 +12,7 @@ import { PublicKey, SystemProgram } from "@solana/web3.js";
 import {
   deserializeEscrowAccount,
   DeserializedEscrow,
-} from "../lib/deserializeEscrow";
+} from "./deserializeEscrow";
 
 export function useProgram() {
   const wallet = useAnchorWallet();
