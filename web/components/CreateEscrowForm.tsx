@@ -36,7 +36,15 @@ const CreateEscrowForm = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    // Ensure the token amounts can only be positive numbers
+    if (name === "sendTokenAmount" || name === "receiveTokenAmount") {
+      if (value === "" || Number(value) > 0) {
+        setFormData({ ...formData, [name]: value });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
