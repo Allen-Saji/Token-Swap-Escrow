@@ -121,6 +121,7 @@ export default function EscrowSearchPage() {
             }}
             escrowAddress={escrowPublicKey}
             onWithdraw={handleWithdraw}
+            buttonText="Swap"
           />
         </div>
       )}

@@ -114,6 +114,7 @@ export default function MyEscrowPage() {
                 escrowData={escrow}
                 escrowAddress={escrow.address}
                 onWithdraw={() => handleWithdraw(escrow, escrow.address)}
+                buttonText="Withdraw"
               />
             ))}
           </div>

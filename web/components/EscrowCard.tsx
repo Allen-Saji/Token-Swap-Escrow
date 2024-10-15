@@ -21,12 +21,14 @@ interface EscrowCardProps {
   escrowData: EscrowData;
   escrowAddress: string;
   onWithdraw: () => void;
+  buttonText: string;
 }
 
 function EscrowCard({
   escrowData,
   escrowAddress,
   onWithdraw,
+  buttonText,
 }: EscrowCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -113,7 +115,7 @@ function EscrowCard({
           onClick={onWithdraw}
           className="w-full bg-black text-gray-300 border  border-gray-300"
         >
-          Withdraw
+          {buttonText}
         </Button>
       </CardFooter>
     </Card>
