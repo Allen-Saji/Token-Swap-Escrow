@@ -6,6 +6,7 @@ import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getMint,
+  createAssociatedTokenAccountInstruction,
 } from "@solana/spl-token";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import {
@@ -190,6 +191,99 @@ export async function refundEscrow(
     return { txSignature: signature };
   } catch (error) {
     console.error("Error refunding escrow:", error);
+    throw error;
+  }
+}
+
+export async function payAndClose(
+  escrowAccount: DeserializedEscrow,
+  takerPublicKey: string,
+  config: { program: Program; provider: AnchorProvider }
+) {
+  if (!config.program || !config.provider) {
+    throw new Error("Program or provider is not initialized");
+  }
+  console.log("escrowAccount:", escrowAccount);
+
+  try {
+    const { connection } = config.provider;
+
+    // Get the public keys
+    const taker = new PublicKey(takerPublicKey);
+    const maker = new PublicKey(escrowAccount.maker);
+    const mintA = new PublicKey(escrowAccount.mintA);
+    const mintB = new PublicKey(escrowAccount.mintB);
+    const seed = new BN(escrowAccount.seed);
+
+    console.log("maker:", maker.toBase58());
+    console.log("taker:", taker.toBase58());
+
+    // Find the program address for the escrow
+    const [escrowPDA] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("escrow"),
+        maker.toBuffer(),
+        seed.toArrayLike(Buffer, "le", 8),
+      ],
+      config.program.programId
+    );
+
+    // Get associated token addresses
+    const takerAtaA = await getAssociatedTokenAddress(mintA, taker);
+    const takerAtaB = await getAssociatedTokenAddress(mintB, taker);
+    const makerAtaB = await getAssociatedTokenAddress(mintB, maker);
+    const vault = await getAssociatedTokenAddress(mintA, escrowPDA, true);
+    console.log("takerAtaA:", takerAtaA.toBase58());
+    console.log("takerAtaB:", takerAtaB.toBase58());
+    console.log("makerAtaB:", makerAtaB.toBase58());
+    console.log("vault:", vault.toBase58());
+
+    // Check if maker's ATA for token B exists
+    const makerAtaBInfo = await connection.getAccountInfo(makerAtaB);
+
+    // Create a transaction
+    const tx = new web3.Transaction();
+
+    // If maker's ATA for token B doesn't exist, add instruction to create it
+    if (!makerAtaBInfo) {
+      console.log("Creating maker's ATA for token B");
+      const createAtaIx = createAssociatedTokenAccountInstruction(
+        taker, // payer
+        makerAtaB, // ata
+        maker, // owner
+        mintB // mint
+      );
+      tx.add(createAtaIx);
+    }
+
+    // Create the take instruction
+    const takeIx = await config.program.methods
+      .take()
+      .accounts({
+        taker: taker,
+        maker: maker,
+        mintA: mintA,
+        mintB: mintB,
+        takerAtaA: takerAtaA,
+        takerAtaB: takerAtaB,
+        makerAtaB: makerAtaB,
+        escrow: escrowPDA,
+        vault: vault,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    // Add the take instruction to the transaction
+    tx.add(takeIx);
+
+    // Send and confirm the transaction
+    const signature = await config.provider.sendAndConfirm(tx);
+    console.log(`Pay and Close transaction signature: ${signature}`);
+    return { txSignature: signature };
+  } catch (error) {
+    console.error("Error in Pay and Close:", error);
     throw error;
   }
 }
