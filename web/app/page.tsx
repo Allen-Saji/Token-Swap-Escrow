@@ -4,7 +4,7 @@ import { FeatureCard } from "../components/ui/FeatureCard";
 import { StepCard } from "../components/ui/StepCard";
 import Link from "next/link";
 
-export default function LandingPageBody() {
+export default function Page() {
   return (
     <main className="min-h-screen bg-black text-gray-300 py-16">
       <div className="container mx-auto px-4">
@@ -52,8 +52,8 @@ export default function LandingPageBody() {
             />
             <StepCard
               number="2"
-              title="Share Escrow Link"
-              description="Generate a Solana Blink link and share it with your swap partner"
+              title="Share Escrow Link or Search Address"
+              description="Generate a Solana Blink link to share with your swap partner or search for an escrow using its unique address"
             />
             <StepCard
               number="3"
@@ -62,8 +62,8 @@ export default function LandingPageBody() {
             />
             <StepCard
               number="4"
-              title="Find Existing Escrows"
-              description="Search for escrows using their unique address to complete swaps"
+              title="Withdraw Escrow Funds"
+              description="If couldn't find a partner to swap your tokens with, you can withdraw your tokens back from the escrow"
             />
           </div>
         </section>
