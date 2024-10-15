@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-token_swap_escrow = "BijCEyP7WqxbuYWpBaHjgV2pigN166NMjhMvE1d3moYx"
+token_swap_escrow = "6U2q3J5Ubi7gdboM1baGiz51kam7puCRo3QyztpEZ4FY"
 
 [programs.devnet]
 token_swap_escrow = "6U2q3J5Ubi7gdboM1baGiz51kam7puCRo3QyztpEZ4FY"
@@ -14,7 +14,7 @@ token_swap_escrow = "6U2q3J5Ubi7gdboM1baGiz51kam7puCRo3QyztpEZ4FY"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "Localnet"
 wallet = "/home/allen/token_swap_escrow/programs/token_swap_escrow/wallet/keypair.json"
 
 [scripts]
