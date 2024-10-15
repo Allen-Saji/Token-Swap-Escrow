@@ -33,12 +33,12 @@ function EscrowCard({
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000); // Hide tooltip after 2 seconds
+      setTimeout(() => setCopiedField(null), 2000);
     });
   };
 
   const shortenAddress = (address: string) =>
-    `${address.slice(0, 6)}...${address.slice(-6)}`;
+    `${address.slice(0, 4)}...${address.slice(-4)}`;
 
   return (
     <Card className="w-full max-w-md bg-black text-gray-300">
@@ -48,7 +48,8 @@ function EscrowCard({
       <CardContent className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <strong>Escrow Address:</strong> {shortenAddress(escrowAddress)}
+            <strong>Escrow Address:</strong>{" "}
+            <span className="text-sm">{shortenAddress(escrowAddress)}</span>
           </div>
           <Button
             variant="ghost"
@@ -64,7 +65,10 @@ function EscrowCard({
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <strong>Mint A:</strong> {shortenAddress(escrowData.mintA)}
+            <strong>Mint A:</strong>{" "}
+            <span className="text-sm mx-2">
+              {shortenAddress(escrowData.mintA)}
+            </span>
           </div>
           <Button
             variant="ghost"
@@ -80,7 +84,10 @@ function EscrowCard({
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <strong>Mint B:</strong> {shortenAddress(escrowData.mintB)}
+            <strong>Mint B:</strong>{" "}
+            <span className="text-sm mx-2">
+              {shortenAddress(escrowData.mintB)}
+            </span>
           </div>
           <Button
             variant="ghost"
@@ -94,10 +101,10 @@ function EscrowCard({
             )}
           </Button>
         </div>
-        <div>
+        <div className="text-left">
           <strong>Deposit Amount:</strong> {escrowData.deposit}
         </div>
-        <div>
+        <div className="text-left">
           <strong>Receive Amount:</strong> {escrowData.receive}
         </div>
       </CardContent>
