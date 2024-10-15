@@ -71,11 +71,9 @@ export default function EscrowSearchPage() {
       if (!response.ok) {
         throw new Error("Failed to remove escrow from database");
       }
-
-      console.log("Escrow removed from database successfully");
       toast({
         title: "Success",
-        description: "Escrow withdrawn successfully",
+        description: "Token swapped successfully",
       });
       setEscrowData(null);
     } catch (error) {
@@ -83,7 +81,7 @@ export default function EscrowSearchPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to withdraw escrow. Please try again.",
+        description: "Failed to swap tokens. Please try again.",
       });
     }
   };
