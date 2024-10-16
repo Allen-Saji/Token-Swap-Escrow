@@ -215,9 +215,6 @@ export async function payAndClose(
     const mintB = new PublicKey(escrowAccount.mintB);
     const seed = new BN(escrowAccount.seed);
 
-    console.log("maker:", maker.toBase58());
-    console.log("taker:", taker.toBase58());
-
     // Find the program address for the escrow
     const [escrowPDA] = PublicKey.findProgramAddressSync(
       [
@@ -233,10 +230,6 @@ export async function payAndClose(
     const takerAtaB = await getAssociatedTokenAddress(mintB, taker);
     const makerAtaB = await getAssociatedTokenAddress(mintB, maker);
     const vault = await getAssociatedTokenAddress(mintA, escrowPDA, true);
-    console.log("takerAtaA:", takerAtaA.toBase58());
-    console.log("takerAtaB:", takerAtaB.toBase58());
-    console.log("makerAtaB:", makerAtaB.toBase58());
-    console.log("vault:", vault.toBase58());
 
     // Check if maker's ATA for token B exists
     const makerAtaBInfo = await connection.getAccountInfo(makerAtaB);
