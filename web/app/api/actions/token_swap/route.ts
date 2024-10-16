@@ -132,9 +132,6 @@ export async function POST(req: NextRequest) {
     const makerAtaB = await getAssociatedTokenAddress(mintB, maker);
     const vault = await getAssociatedTokenAddress(mintA, escrowPDA, true);
 
-    // Check if maker's ATA for token B exists
-    const makerAtaBInfo = await connection.getAccountInfo(makerAtaB);
-
     // Get the latest blockhash
     const { blockhash, lastValidBlockHeight } =
       await connection.getLatestBlockhash();
@@ -146,6 +143,10 @@ export async function POST(req: NextRequest) {
       lastValidBlockHeight,
     });
 
+    // Check if maker's ATA for token B exists
+    const makerAtaBInfo = await connection.getAccountInfo(makerAtaB);
+    // Check if taker's ATA for token A exists
+    const takerAtaAInfo = await connection.getAccountInfo(takerAtaA);
     // If maker's ATA for token B doesn't exist, add instruction to create it
     if (!makerAtaBInfo) {
       console.log("Creating maker's ATA for token B");
@@ -156,6 +157,18 @@ export async function POST(req: NextRequest) {
         mintB // mint
       );
       transaction.add(createAtaIx);
+    }
+
+    // If taker's ATA for token A doesn't exist, add instruction to create it
+    if (!takerAtaAInfo) {
+      console.log("Creating taker's ATA for token A");
+      const createTakerAtaAIx = createAssociatedTokenAccountInstruction(
+        taker, // payer
+        takerAtaA, // ata
+        taker, // owner
+        mintA // mint
+      );
+      transaction.add(createTakerAtaAIx);
     }
 
     // Create the take instruction
