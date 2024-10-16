@@ -95,6 +95,7 @@ export default function MyEscrowPage() {
       </div>
     );
   }
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -115,6 +116,7 @@ export default function MyEscrowPage() {
                 escrowAddress={escrow.address}
                 onWithdraw={() => handleWithdraw(escrow, escrow.address)}
                 buttonText="Withdraw"
+                blink={`${SITE_URL}/api/actions/token_swap?escrowAddress=${escrow.address}`}
               />
             ))}
           </div>

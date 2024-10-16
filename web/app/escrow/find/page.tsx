@@ -85,7 +85,7 @@ export default function EscrowSearchPage() {
       });
     }
   };
-
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-center text-gray-300">
@@ -119,6 +119,7 @@ export default function EscrowSearchPage() {
             }}
             escrowAddress={escrowPublicKey}
             onWithdraw={handleWithdraw}
+            blink={`${SITE_URL}/api/actions/token_swap?escrowAddress=${escrowPublicKey}`}
             buttonText="Swap"
           />
         </div>

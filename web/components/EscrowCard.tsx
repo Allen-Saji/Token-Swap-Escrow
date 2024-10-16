@@ -20,6 +20,7 @@ interface EscrowData {
 interface EscrowCardProps {
   escrowData: EscrowData;
   escrowAddress: string;
+  blink: string;
   onWithdraw: () => void;
   buttonText: string;
 }
@@ -27,6 +28,7 @@ interface EscrowCardProps {
 function EscrowCard({
   escrowData,
   escrowAddress,
+  blink,
   onWithdraw,
   buttonText,
 }: EscrowCardProps) {
@@ -110,12 +112,21 @@ function EscrowCard({
           <strong>Receive Amount:</strong> {escrowData.receive}
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col space-y-2">
         <Button
           onClick={onWithdraw}
-          className="w-full bg-black text-gray-300 border  border-gray-300"
+          className="w-full bg-black text-gray-300 border border-gray-300"
         >
           {buttonText}
+        </Button>
+        <Button
+          onClick={() => copyToClipboard(blink, "blink")}
+          className="w-full bg-black text-gray-300 border border-gray-300"
+        >
+          Copy Blink
+          {copiedField === "blink" && (
+            <span className="ml-2 text-xs text-green-500">Copied!</span>
+          )}
         </Button>
       </CardFooter>
     </Card>
