@@ -66,6 +66,7 @@ export async function GET(req: NextRequest) {
       headers: ACTIONS_CORS_HEADERS,
     });
   } catch (error) {
+    console.error("Error occurred:", error);
     return NextResponse.json(
       { error: "Failed to fetch blink data" },
       { status: 500 }
@@ -102,10 +103,11 @@ export async function POST(req: NextRequest) {
     try {
       takerPubKey = new PublicKey(body.account);
     } catch (err) {
-      return new Response('Invalid "account" provided', {
-        status: 400,
-        headers: ACTIONS_CORS_HEADERS,
-      });
+      console.error("Error occurred:", err);
+      return NextResponse.json(
+        { error: "Invalid account provided" },
+        { status: 400 }
+      );
     }
 
     const taker = new PublicKey(takerPubKey);
@@ -185,7 +187,7 @@ export async function POST(req: NextRequest) {
     });
     const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
-    const deleteResponse = await fetch(
+    await fetch(
       `${SITE_URL}/api/escrow?walletAddress=${
         escrowAccount.maker
       }&escrowId=${escrowPDA.toString()}`,

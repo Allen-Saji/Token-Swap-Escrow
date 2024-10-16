@@ -17,7 +17,8 @@ export default function EscrowSearchPage() {
   const { program, provider } = useProgram();
   const { toast } = useToast();
 
-  const handleSearch = async () => {
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!escrowPublicKey) {
       toast({
         variant: "destructive",
@@ -60,7 +61,6 @@ export default function EscrowSearchPage() {
         program,
         provider,
       });
-      // Call the DELETE function after successful refund
       const response = await fetch(
         `/api/escrow?walletAddress=${escrowData.maker}&escrowId=${escrowPublicKey}`,
         {
@@ -85,13 +85,15 @@ export default function EscrowSearchPage() {
       });
     }
   };
+
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-center text-gray-300">
         Search Escrow
       </h1>
-      <div className="flex space-x-4 mb-8">
+      <form onSubmit={handleSearch} className="flex space-x-4 mb-8">
         <Input
           type="text"
           placeholder="Enter escrow public key"
@@ -100,13 +102,13 @@ export default function EscrowSearchPage() {
           className="flex-grow bg-gray-800 text-gray-300 border-gray-700"
         />
         <Button
-          onClick={handleSearch}
+          type="submit"
           disabled={isLoading}
           className="bg-gray-700 text-gray-300 hover:bg-gray-600"
         >
           {isLoading ? "Searching..." : "Search"}
         </Button>
-      </div>
+      </form>
       {escrowData && (
         <div className="flex justify-center">
           <EscrowCard
