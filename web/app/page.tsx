@@ -68,6 +68,33 @@ export default function Page() {
           </div>
         </section>
 
+        <section className="mb-16 bg-gray-900 p-6 rounded-lg">
+          <h3 className="text-2xl font-bold mb-4 text-white">
+            Important Note:
+          </h3>
+          <p className="text-lg">
+            Since this blink is not currently registered in the dialect registry
+            and is only available on devnet, please follow these steps:
+          </p>
+          <ol className="list-decimal list-inside mt-4 space-y-2">
+            <li>
+              Go to{" "}
+              <a
+                href="https://dial.to/"
+                className="text-blue-400 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://dial.to/
+              </a>
+            </li>
+            <li>Paste the blink and click submit</li>
+            <li>Switch Dialect to devnet</li>
+            <li>Connect your wallet in devnet as well</li>
+            <li>Then proceed with the swap</li>
+          </ol>
+        </section>
+
         <section className="text-center">
           <h2 className="text-3xl font-bold mb-4 text-white">Ready to Swap?</h2>
           <p className="text-xl mb-8">
