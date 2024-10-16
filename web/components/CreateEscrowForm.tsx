@@ -131,7 +131,8 @@ const CreateEscrowForm = () => {
         {/* Escrow Seed */}
         <div>
           <label className="block text-gray-300 mb-2" htmlFor="escrowSeed">
-            Escrow Seed
+            Escrow Seed (any random integer,just to make sure each user escrow
+            is unique)
           </label>
           <input
             type="text"
@@ -147,7 +148,7 @@ const CreateEscrowForm = () => {
         {/* Send Token Mint */}
         <div>
           <label className="block text-gray-300 mb-2" htmlFor="sendTokenMint">
-            Send Token Mint
+            Send Token Mint (mint of the token you want to send)
           </label>
           <input
             type="text"
@@ -182,7 +183,7 @@ const CreateEscrowForm = () => {
             className="block text-gray-300 mb-2"
             htmlFor="receiveTokenMint"
           >
-            Receive Token Mint
+            Receive Token Mint (mint of the token you want to receive)
           </label>
           <input
             type="text"
