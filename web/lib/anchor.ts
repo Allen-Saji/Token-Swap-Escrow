@@ -233,6 +233,8 @@ export async function payAndClose(
 
     // Check if maker's ATA for token B exists
     const makerAtaBInfo = await connection.getAccountInfo(makerAtaB);
+    // Check if taker's ATA for token A exists
+    const takerAtaAInfo = await connection.getAccountInfo(takerAtaA);
 
     // Create a transaction
     const tx = new web3.Transaction();
@@ -240,13 +242,25 @@ export async function payAndClose(
     // If maker's ATA for token B doesn't exist, add instruction to create it
     if (!makerAtaBInfo) {
       console.log("Creating maker's ATA for token B");
-      const createAtaIx = createAssociatedTokenAccountInstruction(
+      const createMakerAtaBIx = createAssociatedTokenAccountInstruction(
         taker, // payer
         makerAtaB, // ata
         maker, // owner
         mintB // mint
       );
-      tx.add(createAtaIx);
+      tx.add(createMakerAtaBIx);
+    }
+
+    // If taker's ATA for token A doesn't exist, add instruction to create it
+    if (!takerAtaAInfo) {
+      console.log("Creating taker's ATA for token A");
+      const createTakerAtaAIx = createAssociatedTokenAccountInstruction(
+        taker, // payer
+        takerAtaA, // ata
+        taker, // owner
+        mintA // mint
+      );
+      tx.add(createTakerAtaAIx);
     }
 
     // Create the take instruction
