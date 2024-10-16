@@ -12,7 +12,7 @@ Swap Vault is a trustless escrow based token swap platform, allowing users to cr
 
 Check out our demo video to see the Swap Vault in action:
 
-[![Swap Vault Demo](https://www.loom.com/share/2c7cfb0b1c564bf59250ec60cf61a0d9?sid=9d1a8027-a7b8-4ab1-a8ed-50eddf4dbc97)
+https://www.loom.com/share/2c7cfb0b1c564bf59250ec60cf61a0d9?sid=9d1a8027-a7b8-4ab1-a8ed-50eddf4dbc97
 
 ## Local Setup
 
