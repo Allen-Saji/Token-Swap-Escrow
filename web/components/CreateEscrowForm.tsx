@@ -162,7 +162,7 @@ const CreateEscrowForm = () => {
                 <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
               </TooltipTrigger>
               <TooltipContent>
-                This is a random integer to ensure each user's escrow is unique.
+                This is a random integer to ensure each user escrow is unique.
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
