@@ -4,6 +4,13 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { createEscrow, useProgram } from "../lib/anchor";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 const CreateEscrowForm = () => {
   const { publicKey, connected } = useWallet();
@@ -112,108 +119,179 @@ const CreateEscrowForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Maker Public Key */}
-        <div>
-          <label className="block text-gray-300 mb-2" htmlFor="makerPublicKey">
+        <div className="flex items-center">
+          <label
+            className="block text-gray-300 mb-2 flex-1"
+            htmlFor="makerPublicKey"
+          >
             Maker Public Key
           </label>
-          <input
-            type="text"
-            id="makerPublicKey"
-            name="makerPublicKey"
-            value={formData.makerPublicKey} // Field is populated if wallet is connected
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-            disabled={!!publicKey} // Disable input if the wallet is connected
-            required
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                This is the public key of the wallet making the escrow.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <input
+          type="text"
+          id="makerPublicKey"
+          name="makerPublicKey"
+          value={formData.makerPublicKey} // Field is populated if wallet is connected
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
+          disabled={!!publicKey} // Disable input if the wallet is connected
+          required
+        />
 
         {/* Escrow Seed */}
-        <div>
-          <label className="block text-gray-300 mb-2" htmlFor="escrowSeed">
-            Escrow Seed (any random integer,just to make sure each user escrow
-            is unique)
+        <div className="flex items-center">
+          <label
+            className="block text-gray-300 mb-2 flex-1"
+            htmlFor="escrowSeed"
+          >
+            Escrow Seed
           </label>
-          <input
-            type="text"
-            id="escrowSeed"
-            name="escrowSeed"
-            value={formData.escrowSeed}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-            required
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                This is a random integer to ensure each user's escrow is unique.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <input
+          type="text"
+          id="escrowSeed"
+          name="escrowSeed"
+          value={formData.escrowSeed}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
+          required
+        />
 
         {/* Send Token Mint */}
-        <div>
-          <label className="block text-gray-300 mb-2" htmlFor="sendTokenMint">
-            Send Token Mint (mint of the token you want to send)
+        <div className="flex items-center">
+          <label
+            className="block text-gray-300 mb-2 flex-1"
+            htmlFor="sendTokenMint"
+          >
+            Send Token Mint
           </label>
-          <input
-            type="text"
-            id="sendTokenMint"
-            name="sendTokenMint"
-            value={formData.sendTokenMint}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-            required
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                This is the mint of the token you want to send.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <input
+          type="text"
+          id="sendTokenMint"
+          name="sendTokenMint"
+          value={formData.sendTokenMint}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
+          required
+        />
 
         {/* No. of send Token */}
-        <div>
-          <label className="block text-gray-300 mb-2" htmlFor="sendTokenAmount">
+        <div className="flex items-center">
+          <label
+            className="block text-gray-300 mb-2 flex-1"
+            htmlFor="sendTokenAmount"
+          >
             No. of Send Token
           </label>
-          <input
-            type="number"
-            id="sendTokenAmount"
-            name="sendTokenAmount"
-            value={formData.sendTokenAmount}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-            required
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                This is the number of tokens you want to send.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <input
+          type="number"
+          id="sendTokenAmount"
+          name="sendTokenAmount"
+          value={formData.sendTokenAmount}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
+          required
+        />
 
         {/* Receive Token Mint */}
-        <div>
+        <div className="flex items-center">
           <label
-            className="block text-gray-300 mb-2"
+            className="block text-gray-300 mb-2 flex-1"
             htmlFor="receiveTokenMint"
           >
-            Receive Token Mint (mint of the token you want to receive)
+            Receive Token Mint
           </label>
-          <input
-            type="text"
-            id="receiveTokenMint"
-            name="receiveTokenMint"
-            value={formData.receiveTokenMint}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-            required
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                This is the mint of the token you want to receive.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <input
+          type="text"
+          id="receiveTokenMint"
+          name="receiveTokenMint"
+          value={formData.receiveTokenMint}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
+          required
+        />
 
         {/* No. of Receive Token */}
-        <div>
+        <div className="flex items-center">
           <label
-            className="block text-gray-300 mb-2"
+            className="block text-gray-300 mb-2 flex-1"
             htmlFor="receiveTokenAmount"
           >
             No. of Receive Token
           </label>
-          <input
-            type="number"
-            id="receiveTokenAmount"
-            name="receiveTokenAmount"
-            value={formData.receiveTokenAmount}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-            required
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                This is the number of tokens you want to receive.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <input
+          type="number"
+          id="receiveTokenAmount"
+          name="receiveTokenAmount"
+          value={formData.receiveTokenAmount}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
+          required
+        />
 
         {/* Submit Button */}
         <div className="text-center">
