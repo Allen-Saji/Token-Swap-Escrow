@@ -130,7 +130,7 @@ export default function MyEscrowPage() {
         ) : escrows.length === 0 ? (
           <Card className="p-6">
             <div className="text-center">
-              <p className="text-lg">You don't have any active escrows.</p>
+              <p className="text-lg">You don&apos;t have any active escrows.</p>
               <p className="mt-2 text-gray-600">
                 Create a new escrow to get started.
               </p>

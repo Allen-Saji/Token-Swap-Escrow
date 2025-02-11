@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { createEscrow, useProgram } from "../lib/anchor";
 import { useToast } from "@/hooks/use-toast";
@@ -18,14 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-// Define the interface to match the expected EscrowFormData type
 interface EscrowFormData {
   makerPublicKey: string;
   escrowSeed: string;
   sendTokenMint: string;
-  sendTokenAmount: string; // Changed to string to match form input
+  sendTokenAmount: string;
   receiveTokenMint: string;
-  receiveTokenAmount: string; // Changed to string to match form input
+  receiveTokenAmount: string;
 }
 
 const formSchema = z.object({
@@ -37,14 +36,14 @@ const formSchema = z.object({
     .min(1, "Must be greater than 0"),
   sendTokenMint: z.string().min(32, "Invalid token mint address"),
   sendTokenAmount: z
-    .string() // Changed to string to match form input
+    .string()
     .refine(
       (val) => !isNaN(Number(val)) && Number(val) > 0,
       "Must be a positive number"
     ),
   receiveTokenMint: z.string().min(32, "Invalid token mint address"),
   receiveTokenAmount: z
-    .string() // Changed to string to match form input
+    .string()
     .refine(
       (val) => !isNaN(Number(val)) && Number(val) > 0,
       "Must be a positive number"
