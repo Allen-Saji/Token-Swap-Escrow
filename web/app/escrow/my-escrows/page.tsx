@@ -109,8 +109,8 @@ export default function MyEscrowPage() {
 
       <div className="w-full max-w-6xl">
         {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
-            <div className="text-center">
+          <div className="w-full h-64 flex items-center justify-center">
+            <div className="flex flex-col items-center">
               <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
               <p className="text-lg">Loading your escrows...</p>
             </div>
