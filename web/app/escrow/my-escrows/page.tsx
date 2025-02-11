@@ -5,6 +5,7 @@ import EscrowCard from "@/components/EscrowCard";
 import { useProgram, fetchEscrowData, refundEscrow } from "@/lib/anchor";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { DeserializedEscrow } from "@/lib/deserializeEscrow";
+import { Card } from "@/components/ui/card";
 
 interface EscrowWithAddress extends DeserializedEscrow {
   address: string;
@@ -38,7 +39,6 @@ export default function MyEscrowPage() {
       }
       const data = await response.json();
 
-      // Fetch detailed escrow data for each escrow
       const escrowsWithData: EscrowWithAddress[] = await Promise.all(
         data.escrows.map(async (escrowAddress: string) => {
           const escrowData = await fetchEscrowData(escrowAddress, connection);
@@ -66,7 +66,6 @@ export default function MyEscrowPage() {
       await refundEscrow(escrow, { program, provider });
       console.log("Refunding escrow deposit to:", escrow.maker);
 
-      // Call the DELETE function after successful refund
       const response = await fetch(
         `/api/escrow?walletAddress=${publicKey.toBase58()}&escrowId=${address}`,
         {
@@ -78,9 +77,6 @@ export default function MyEscrowPage() {
         throw new Error("Failed to remove escrow from database");
       }
 
-      console.log("Escrow removed from database successfully");
-
-      // After successful withdrawal and database update, refetch the escrows
       await fetchEscrows();
     } catch (err) {
       console.error("Error withdrawing from escrow or updating database:", err);
@@ -88,27 +84,60 @@ export default function MyEscrowPage() {
     }
   };
 
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+
   if (!connected) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        Please connect your wallet to view your escrows.
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+        <Card className="p-6">
+          <p className="text-lg font-medium text-center">
+            Please connect your wallet to view your escrows.
+          </p>
+        </Card>
       </div>
     );
   }
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-6">My Escrows</h1>
+    <div className="container mx-auto min-h-[calc(100vh-4rem)] px-4 py-8 flex flex-col items-center">
+      <div className="mb-8 text-center w-full">
+        <h1 className="text-3xl font-bold">My Escrows</h1>
+        <p className="mt-2 text-gray-600">
+          Manage your active escrow positions
+        </p>
+      </div>
+
+      <div className="w-full max-w-6xl">
         {isLoading ? (
-          <p>Loading escrows...</p>
+          <div className="flex h-64 items-center justify-center">
+            <div className="text-center">
+              <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+              <p className="text-lg">Loading your escrows...</p>
+            </div>
+          </div>
         ) : error ? (
-          <p className="text-red-500">Error: {error}</p>
+          <Card className="p-6 bg-red-50">
+            <p className="text-red-600 text-center">Error: {error}</p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={fetchEscrows}
+                className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          </Card>
         ) : escrows.length === 0 ? (
-          <p>You have no escrows.</p>
+          <Card className="p-6">
+            <div className="text-center">
+              <p className="text-lg">You don't have any active escrows.</p>
+              <p className="mt-2 text-gray-600">
+                Create a new escrow to get started.
+              </p>
+            </div>
+          </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 place-items-center">
             {escrows.map((escrow) => (
               <EscrowCard
                 key={escrow.address}
