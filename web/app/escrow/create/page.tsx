@@ -1,12 +1,14 @@
 import React from "react";
 import CreateEscrowForm from "@/components/CreateEscrowForm";
 
-function page() {
+function Page() {
   return (
-    <>
-      <CreateEscrowForm />
-    </>
+    <main className="container mx-auto px-4 py-8">
+      <div className="min-h-[calc(100vh-4rem)] flex items-start justify-center">
+        <CreateEscrowForm />
+      </div>
+    </main>
   );
 }
 
-export default page;
+export default Page;

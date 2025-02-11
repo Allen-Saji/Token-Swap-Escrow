@@ -4,13 +4,52 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { createEscrow, useProgram } from "../lib/anchor";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Info } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+// Define the interface to match the expected EscrowFormData type
+interface EscrowFormData {
+  makerPublicKey: string;
+  escrowSeed: string;
+  sendTokenMint: string;
+  sendTokenAmount: string; // Changed to string to match form input
+  receiveTokenMint: string;
+  receiveTokenAmount: string; // Changed to string to match form input
+}
+
+const formSchema = z.object({
+  makerPublicKey: z.string().min(32, "Invalid public key"),
+  escrowSeed: z.coerce
+    .number()
+    .int("Must be an integer")
+    .positive("Must be a positive number")
+    .min(1, "Must be greater than 0"),
+  sendTokenMint: z.string().min(32, "Invalid token mint address"),
+  sendTokenAmount: z
+    .string() // Changed to string to match form input
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) > 0,
+      "Must be a positive number"
+    ),
+  receiveTokenMint: z.string().min(32, "Invalid token mint address"),
+  receiveTokenAmount: z
+    .string() // Changed to string to match form input
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) > 0,
+      "Must be a positive number"
+    ),
+});
 
 const CreateEscrowForm = () => {
   const { publicKey, connected } = useWallet();
@@ -18,44 +57,27 @@ const CreateEscrowForm = () => {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [formData, setFormData] = useState({
-    makerPublicKey: "",
-    escrowSeed: "",
-    sendTokenMint: "",
-    sendTokenAmount: "",
-    receiveTokenMint: "",
-    receiveTokenAmount: "",
+  const form = useForm<EscrowFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      makerPublicKey: "",
+      escrowSeed: "",
+      sendTokenMint: "",
+      sendTokenAmount: "",
+      receiveTokenMint: "",
+      receiveTokenAmount: "",
+    },
   });
 
   useEffect(() => {
     if (connected && publicKey) {
-      setFormData((prevData) => ({
-        ...prevData,
-        makerPublicKey: publicKey.toBase58(),
-      }));
+      form.setValue("makerPublicKey", publicKey.toBase58());
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        makerPublicKey: "",
-      }));
+      form.setValue("makerPublicKey", "");
     }
-  }, [connected, publicKey]);
+  }, [connected, publicKey, form]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    // Ensure the token amounts can only be positive numbers
-    if (name === "sendTokenAmount" || name === "receiveTokenAmount") {
-      if (value === "" || Number(value) > 0) {
-        setFormData({ ...formData, [name]: value });
-      }
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: EscrowFormData) => {
     if (!connected) {
       toast({
         variant: "destructive",
@@ -76,7 +98,7 @@ const CreateEscrowForm = () => {
 
     try {
       const { txSignature: signature, escrow: escrowAddress } =
-        await createEscrow(formData, config);
+        await createEscrow(data, config);
 
       const response = await fetch("/api/escrow", {
         method: "POST",
@@ -84,7 +106,7 @@ const CreateEscrowForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          walletAddress: formData.makerPublicKey,
+          walletAddress: data.makerPublicKey,
           escrowAddress: escrowAddress,
         }),
       });
@@ -94,11 +116,13 @@ const CreateEscrowForm = () => {
       }
 
       toast({
-        title: "Escrow created",
-        description: `Escrow created with signature: ${signature}`,
+        title: "Success",
+        description: `Escrow created successfully. Signature: ${signature.slice(
+          0,
+          8
+        )}...`,
       });
 
-      // Redirect to the my-escrows page after successful creation
       router.push("/escrow/my-escrows");
     } catch (error) {
       toast({
@@ -112,198 +136,153 @@ const CreateEscrowForm = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-black rounded-md">
-      <h2 className="text-2xl font-bold text-gray-300 mb-6 text-center">
-        Create Escrow
-      </h2>
+    <Card className="max-w-5xl mx-auto p-8 bg-black">
+      <CardHeader className="pb-8">
+        <CardTitle className="text-3xl font-bold text-gray-300 text-center">
+          Create Escrow
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="makerPublicKey"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-300">
+                      Maker Public Key
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Your wallet address"
+                        className="bg-gray-800 text-gray-300 border-gray-600 h-12 text-lg"
+                        disabled={!!publicKey}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="escrowSeed"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-300">Escrow Seed</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="1"
+                        step="1"
+                        placeholder="Enter a positive integer (e.g., 12345)"
+                        className="bg-gray-800 text-gray-300 border-gray-600 h-12 text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Maker Public Key */}
-        <div className="flex items-center">
-          <label
-            className="block text-gray-300 mb-2 flex-1"
-            htmlFor="makerPublicKey"
-          >
-            Maker Public Key
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                This is the public key of the wallet making the escrow.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <input
-          type="text"
-          id="makerPublicKey"
-          name="makerPublicKey"
-          value={formData.makerPublicKey} // Field is populated if wallet is connected
-          onChange={handleChange}
-          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-          disabled={!!publicKey} // Disable input if the wallet is connected
-          required
-        />
+              <FormField
+                control={form.control}
+                name="sendTokenMint"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-300">
+                      Send Token Mint
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Token mint address you want to send"
+                        className="bg-gray-800 text-gray-300 border-gray-600 h-12 text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sendTokenAmount"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-300">
+                      Send Token Amount
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0.000000001"
+                        step="0.000000001"
+                        placeholder="Amount of tokens to send (> 0)"
+                        className="bg-gray-800 text-gray-300 border-gray-600 h-12 text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
 
-        {/* Escrow Seed */}
-        <div className="flex items-center">
-          <label
-            className="block text-gray-300 mb-2 flex-1"
-            htmlFor="escrowSeed"
-          >
-            Escrow Seed
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                This is a random integer to ensure each user escrow is unique.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <input
-          type="text"
-          id="escrowSeed"
-          name="escrowSeed"
-          value={formData.escrowSeed}
-          onChange={handleChange}
-          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-          required
-        />
+              <FormField
+                control={form.control}
+                name="receiveTokenMint"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-300">
+                      Receive Token Mint
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Token mint address you want to receive"
+                        className="bg-gray-800 text-gray-300 border-gray-600 h-12 text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="receiveTokenAmount"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-300">
+                      Receive Token Amount
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0.000000001"
+                        step="0.000000001"
+                        placeholder="Amount of tokens to receive (> 0)"
+                        className="bg-gray-800 text-gray-300 border-gray-600 h-12 text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-        {/* Send Token Mint */}
-        <div className="flex items-center">
-          <label
-            className="block text-gray-300 mb-2 flex-1"
-            htmlFor="sendTokenMint"
-          >
-            Send Token Mint
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                This is the mint of the token you want to send.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <input
-          type="text"
-          id="sendTokenMint"
-          name="sendTokenMint"
-          value={formData.sendTokenMint}
-          onChange={handleChange}
-          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-          required
-        />
-
-        {/* No. of send Token */}
-        <div className="flex items-center">
-          <label
-            className="block text-gray-300 mb-2 flex-1"
-            htmlFor="sendTokenAmount"
-          >
-            No. of Send Token
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                This is the number of tokens you want to send.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <input
-          type="number"
-          id="sendTokenAmount"
-          name="sendTokenAmount"
-          value={formData.sendTokenAmount}
-          onChange={handleChange}
-          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-          required
-        />
-
-        {/* Receive Token Mint */}
-        <div className="flex items-center">
-          <label
-            className="block text-gray-300 mb-2 flex-1"
-            htmlFor="receiveTokenMint"
-          >
-            Receive Token Mint
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                This is the mint of the token you want to receive.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <input
-          type="text"
-          id="receiveTokenMint"
-          name="receiveTokenMint"
-          value={formData.receiveTokenMint}
-          onChange={handleChange}
-          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-          required
-        />
-
-        {/* No. of Receive Token */}
-        <div className="flex items-center">
-          <label
-            className="block text-gray-300 mb-2 flex-1"
-            htmlFor="receiveTokenAmount"
-          >
-            No. of Receive Token
-          </label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="text-gray-400 hover:text-gray-300 ml-2 flex-shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                This is the number of tokens you want to receive.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <input
-          type="number"
-          id="receiveTokenAmount"
-          name="receiveTokenAmount"
-          value={formData.receiveTokenAmount}
-          onChange={handleChange}
-          className="w-full p-2 bg-gray-800 text-gray-300 rounded-md border border-gray-600"
-          required
-        />
-
-        {/* Submit Button */}
-        <div className="text-center">
-          <button
-            type="submit"
-            className="w-full p-2 bg-gray-300 text-black font-semibold rounded-md hover:bg-gray-400 transition"
-          >
-            {connected ? "Create Escrow" : "Connect Wallet First"}
-          </button>
-        </div>
-      </form>
-    </div>
+            <button
+              type="submit"
+              className="w-full p-4 mt-6 bg-gray-300 text-black text-lg font-semibold rounded-md hover:bg-gray-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!connected}
+            >
+              {connected ? "Create Escrow" : "Connect Wallet First"}
+            </button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };
 
