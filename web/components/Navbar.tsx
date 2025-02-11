@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { Plus, Search, FolderOpen } from "lucide-react";
 
 const WalletMultiButton = dynamic(
   async () =>
@@ -16,7 +17,7 @@ const Navbar = () => {
       className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 transition-all duration-300 
     w-full bg-black`}
     >
-      <div className="text-gray-300  font-bold">
+      <div className="text-gray-300 font-bold">
         <Link href="/">
           <Image
             src="/logo.png"
@@ -30,17 +31,20 @@ const Navbar = () => {
       </div>
       <div className="flex space-x-8">
         <Link href="/escrow/create">
-          <div className="text-gray-300 hover:text-white text-xl mx-4">
+          <div className="flex items-center text-gray-300 hover:text-violet-400 text-xl mx-4">
+            <Plus className="mr-2 h-5 w-5" />
             Create an Escrow
           </div>
         </Link>
         <Link href="/escrow/find">
-          <div className="text-gray-300 hover:text-white text-xl mx-4">
+          <div className="flex items-center text-gray-300 hover:text-violet-400  text-xl mx-4">
+            <Search className="mr-2 h-5 w-5" />
             Find an Escrow
           </div>
         </Link>
         <Link href="/escrow/my-escrows">
-          <div className="text-gray-300 hover:text-white text-xl mx-4">
+          <div className="flex items-center text-gray-300 hover:text-violet-400 text-xl mx-4">
+            <FolderOpen className="mr-2 h-5 w-5" />
             My Escrows
           </div>
         </Link>
